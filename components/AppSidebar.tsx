@@ -43,7 +43,7 @@ const items = [
 export function AppSidebar() {
   return (
     <Sidebar collapsible="icon" className="">
-      <SidebarContent className="mt-10  ">
+      <SidebarContent className="mt-20  ">
         <SidebarGroup>
           <SidebarGroupLabel>Application</SidebarGroupLabel>
           <SidebarGroupContent>

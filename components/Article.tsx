@@ -6,8 +6,28 @@ import { useState } from "react";
 export const Article = () => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [loading, setLoading] = useState(false);
+  const handleGenrate = async () => {
+    if (!title || !content) return alert("please all fields");
+    setLoading(true);
+    try {
+      const res = await fetch("api/articles", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title, content }),
+      });
+      const article = await res.json();
+      console.log(article, "Article");
+       alert("Article generated successfully!");
 
-  // POST /api/articles  ->article title content ugj yvuulna
+     
+       setTitle("");
+       setContent("");
+    } catch (error) {
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <div className="flex justify-center py-10  w-[856px] bg-white p-5 border rounded-lg shadow-2xl">
       <div className="w-[800px] flex flex-col gap-4">
@@ -36,7 +56,9 @@ export const Article = () => {
           />
         </div>
         <div className="justify-end flex w-full ">
-          <Button className="w-[160px] ">Generate summary</Button>
+          <Button onClick={handleGenrate} className="w-[160px] ">
+            {loading ? "Genreting..." : "Generate summary"}
+          </Button>
         </div>
       </div>
     </div>
