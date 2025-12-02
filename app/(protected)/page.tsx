@@ -1,5 +1,6 @@
 "use client";
-import { Article } from "@/components/Article";
+
+import { Dashboard } from "@/components/Dashboard";
 import { useEffect } from "react";
 
 export default function HomePage() {
@@ -22,14 +23,14 @@ export default function HomePage() {
     });
 
     const data = await res.json();
-    console.log(data);
+    console.log(data,"post");
   };
   useEffect(() => {
     postArticles();
   }, []);
   return (
     <div className="mb-50 ">
-      <Article />
+      <Dashboard />
     </div>
   );
 }
