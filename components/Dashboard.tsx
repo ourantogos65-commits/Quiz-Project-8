@@ -3,21 +3,21 @@ import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { useState } from "react";
 import { Textarea } from "./ui/textarea";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-export const Dashboard = () => {
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-  const [summary, setSummary] = useState(null);
-  const [loading, setLoading] = useState(false);
 
-  const handleGenerate = async () => {
+interface QuizItem {
+  question: string;
+  options: string[];
+  answer: string;
+}
+
+export const Dashboard = () => {
+  const [title, setTitle] = useState<string>("");
+  const [content, setContent] = useState<string>("");
+  const [summary, setSummary] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
+  const [quiz, setQuiz] = useState<QuizItem[]>([]);
+
+  const SummaryGenerate = async () => {
     if (!title || !content) return alert("Please fill all fields");
     setLoading(true);
 
@@ -29,12 +29,36 @@ export const Dashboard = () => {
       });
 
       const data = await res.json();
-      console.log(data, "my data");
+      console.log("summary data", data);
 
-      setSummary(data.summary);
+      setSummary(data.summary || "");
+      setQuiz([]);
     } catch (error) {
       console.error(error);
       alert("Failed to generate summary");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const QuizGenerate = async () => {
+    if (!summary) return alert("No summary available");
+    setLoading(true);
+
+    try {
+      const res = await fetch("/api/quiz", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ summary }),
+      });
+
+      const data = await res.json();
+      console.log("quiz data", data);
+
+      setQuiz(Array.isArray(data.quiz) ? data.quiz : []);
+    } catch (error) {
+      console.error(error);
+      alert("Failed to generate quiz");
     } finally {
       setLoading(false);
     }
@@ -45,7 +69,7 @@ export const Dashboard = () => {
       <div className="w-[800px] flex flex-col gap-4">
         <h1 className="text-2xl font-semibold">✨ Article Quiz Generator</h1>
 
-        {summary === null && (
+        {!summary && quiz.length === 0 && (
           <div>
             <p className="text-sm text-gray-400">
               Paste your article below to generate a summary using Google AI.
@@ -71,27 +95,48 @@ export const Dashboard = () => {
             </div>
 
             <div className="flex justify-end w-full">
-              <Button onClick={handleGenerate} className="w-[160px]">
+              <Button onClick={SummaryGenerate} className="w-[160px]">
                 {loading ? "Generating..." : "Generate Summary"}
               </Button>
             </div>
           </div>
         )}
 
-        {summary !== null && (
-          <div className="p-4  ">
+        {summary && quiz.length === 0 && (
+          <div className="p-4">
             <h2 className="font-semibold text-gray-700 mb-2">
               📖 Summarized content
             </h2>
-
-            <p className="text-gray-800 whitespace-pre-line">{summary}</p>
+            <h3 className="text-2xl font-bold mb-2">{title}</h3>
+            <p className="text-gray-800">{summary}</p>
 
             <div className="flex gap-2 mt-4">
-              <Button onClick={() => setSummary(null)}>Generate Again</Button>
-              <Button className="bg-blue-600 text-white">
-                Create Quiz from Summary
+              <Button onClick={() => setSummary("")}>Generate Again</Button>
+              <Button onClick={QuizGenerate} className="bg-blue-600 text-white">
+                {loading ? "Generating..." : "Create Quiz from Summary"}
               </Button>
             </div>
+          </div>
+        )}
+
+        {quiz.length > 0 && (
+          <div>
+            <p className="font-sembibold text-gray-400">
+              Take a quick test about your knowledge from your content
+            </p>
+
+            {quiz.slice(0, 1).map((q, i) => (
+              <div key={i} className="mb-4 border">
+                <h3 className="font-semibold">{q.question}</h3>
+                <p className="list-disc pl-5 mt-1">
+                  {q.options.map((re, idx) => (
+                    <div className="border " key={idx}>
+                      <Button> {re}</Button>
+                    </div>
+                  ))}
+                </p>
+              </div>
+            ))}
           </div>
         )}
       </div>

@@ -24,15 +24,7 @@ export const POST = async (req: Request) => {
 
     const result = await ai.models.generateContent({
       model: "gemini-2.5-flash",
-      contents: `Generate 5 multiple choice questions based on this article: ${content}. Return the response in this exact JSON format:
-      [
-        {
-          "question": "Question text here",
-          "options": ["Option 1", "Option 2", "Option 3", "Option 4"],
-          "answer": "0"
-        }
-      ]
-      Make sure the response is valid JSON and the answer is the index (0-3) of the correct option.`,
+      contents: `Please provide a concise summary of the following article: ${content}`,
     });
 
     console.log(" content:", content);
@@ -42,8 +34,7 @@ export const POST = async (req: Request) => {
   } catch (error) {
     console.error(error);
     return NextResponse.json(
-      { error: "Failed to generate summary" },
-      { status: 500 }
+     console.error(error)
     );
   }
 };

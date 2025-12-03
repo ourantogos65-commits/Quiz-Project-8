@@ -29,9 +29,8 @@
 //   );
 // }
 "use client"
-import { AppSidebar } from "@/components/AppSidebar";
-import Navbar from "@/components/Navbar";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+
+
 import { SignedIn, UserButton, useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 
