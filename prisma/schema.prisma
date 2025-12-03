@@ -1,0 +1,46 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model articles {
+  id      Int     @id @default(autoincrement())
+  title   String?
+  content String?
+}
+
+model departments {
+  id        Int         @id @default(autoincrement())
+  name      String?     @db.VarChar(100)
+  employees employees[]
+}
+
+model employees {
+  id           Int          @id @default(autoincrement())
+  firstname    String?      @db.VarChar(50)
+  lastname     String?      @db.VarChar(50)
+  age          Int?
+  gender       String?      @db.VarChar(10)
+  departmentid Int?
+  position     String?      @db.VarChar(100)
+  hiredate     DateTime?    @db.Date
+  departments  departments? @relation(fields: [departmentid], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model projects {
+  id          Int     @id @default(autoincrement())
+  title       String? @db.VarChar(100)
+  description String?
+  leaderid    Int?
+}
+
+model quiz {
+  id       Int     @id @default(autoincrement())
+  question String?
+  answer   String?
+}
