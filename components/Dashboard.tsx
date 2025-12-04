@@ -1,8 +1,9 @@
 "use client";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Textarea } from "./ui/textarea";
+import { Home } from "lucide-react";
 
 interface QuizItem {
   question: string;
@@ -11,12 +12,39 @@ interface QuizItem {
 }
 
 export const Dashboard = () => {
-  const [title, setTitle] = useState<string>("");
-  const [content, setContent] = useState<string>("");
-  const [summary, setSummary] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(false);
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [summary, setSummary] = useState("");
+  const [loading, setLoading] = useState(false);
   const [quiz, setQuiz] = useState<QuizItem[]>([]);
 
+  const items = [
+    {
+      title: "jamuha",
+    },
+    {
+      title: "Yesugei",
+    },
+    {
+      title: "Temujin",
+    },
+    {
+      title: "Toghrul",
+    },
+  ];
+  const postArticles = async () => {
+    const res = await fetch("/api/articles", {
+      method: "POST",
+
+      body: JSON.stringify({ title }),
+    });
+
+    const data = await res.json();
+    console.log(data, "post article ");
+  };
+  useEffect(() => {
+    postArticles();
+  }, []);
   const SummaryGenerate = async () => {
     if (!title || !content) return alert("Please fill all fields");
     setLoading(true);
@@ -25,13 +53,12 @@ export const Dashboard = () => {
       const res = await fetch("/api/genrate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, content }),
+        body: JSON.stringify({ content }),
       });
 
       const data = await res.json();
-      console.log("summary data", data);
 
-      setSummary(data.summary || "");
+      setSummary(data.summary);
       setQuiz([]);
     } catch (error) {
       console.error(error);
@@ -53,9 +80,8 @@ export const Dashboard = () => {
       });
 
       const data = await res.json();
-      console.log("quiz data", data);
-
-      setQuiz(Array.isArray(data.quiz) ? data.quiz : []);
+      console.log(data,"quiz data")
+      setQuiz(data.quiz);
     } catch (error) {
       console.error(error);
       alert("Failed to generate quiz");
@@ -70,36 +96,51 @@ export const Dashboard = () => {
         <h1 className="text-2xl font-semibold">✨ Article Quiz Generator</h1>
 
         {!summary && quiz.length === 0 && (
-          <div>
-            <p className="text-sm text-gray-400">
-              Paste your article below to generate a summary using Google AI.
-            </p>
-
-            <div>
-              <h1 className="font-medium text-gray-400">Article Title</h1>
-              <Textarea
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="Enter a title for your article..."
-              />
-            </div>
-
-            <div>
-              <h1 className="font-medium text-gray-400">Article Content</h1>
-              <Textarea
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                className="h-[120px]"
-                placeholder="Paste your article content here..."
-              />
-            </div>
-
-            <div className="flex justify-end w-full">
-              <Button onClick={SummaryGenerate} className="w-[160px]">
-                {loading ? "Generating..." : "Generate Summary"}
-              </Button>
-            </div>
+          <div className="w-full  justify-center items-center flex flex-col p-3 gap-1">
+            <h2 className="text-start font-semibold text-xl w-full mb-4">
+              {" "}
+              What was Genghis Khan’s birth name?
+            </h2>
+            {items.map((q, i) => (
+              <div
+                key={i}
+                className="mb-4 border justify-center items-center flex h-12  w-100 rounded-sm cursor-grabbing hover:bg-blue-400 duration-300"
+              >
+                <h3 className="font-semibold">{q.title}</h3>
+              </div>
+            ))}
           </div>
+
+          // <div>
+          //   <p className="text-sm text-gray-400">
+          //     Paste your article below to generate a summary using Google AI.
+          //   </p>
+
+          //   <div>
+          //     <h1 className="font-medium text-gray-400">Article Title</h1>
+          //     <Textarea
+          //       value={title}
+          //       onChange={(e) => setTitle(e.target.value)}
+          //       placeholder="Enter a title for your article..."
+          //     />
+          //   </div>
+
+          //   <div>
+          //     <h1 className="font-medium text-gray-400">Article Content</h1>
+          //     <Textarea
+          //       value={content}
+          //       onChange={(e) => setContent(e.target.value)}
+          //       className="h-[120px]"
+          //       placeholder="Paste your article content here..."
+          //     />
+          //   </div>
+
+          //   <div className="flex justify-end w-full">
+          //     <Button onClick={SummaryGenerate} className="w-[160px] cursor-grabbing">
+          //       {loading ? "Generating..." : "Generate Summary"}
+          //     </Button>
+          //   </div>
+          // </div>
         )}
 
         {summary && quiz.length === 0 && (
@@ -111,8 +152,16 @@ export const Dashboard = () => {
             <p className="text-gray-800">{summary}</p>
 
             <div className="flex gap-2 mt-4">
-              <Button onClick={() => setSummary("")}>Generate Again</Button>
-              <Button onClick={QuizGenerate} className="bg-blue-600 text-white">
+              <Button
+                className="cursor-grabbing"
+                onClick={() => setSummary("")}
+              >
+                Generate Again
+              </Button>
+              <Button
+                onClick={QuizGenerate}
+                className="bg-blue-600 text-white cursor-grabbing"
+              >
                 {loading ? "Generating..." : "Create Quiz from Summary"}
               </Button>
             </div>
@@ -120,21 +169,21 @@ export const Dashboard = () => {
         )}
 
         {quiz.length > 0 && (
-          <div>
-            <p className="font-sembibold text-gray-400">
+          <div className="w-full  justify-center items-center flex flex-col p-3 gap-1">
+            <p className="font-sembibold text-gray-400 ">
               Take a quick test about your knowledge from your content
             </p>
 
-            {quiz.slice(0, 1).map((q, i) => (
-              <div key={i} className="mb-4 border">
-                <h3 className="font-semibold">{q.question}</h3>
-                <p className="list-disc pl-5 mt-1">
-                  {q.options.map((re, idx) => (
-                    <div className="border " key={idx}>
-                      <Button> {re}</Button>
-                    </div>
-                  ))}
-                </p>
+            <h2 className="text-start font-semibold text-xl w-full mb-4">
+              {" "}
+              What was Genghis Khan’s birth name?
+            </h2>
+            {items.map((q, i) => (
+              <div
+                key={i}
+                className="mb-4 border justify-center items-center flex h-12  w-100 rounded-sm cursor-grabbing hover:bg-blue-400 duration-300"
+              >
+                <h3 className="font-semibold">{q.title}</h3>
               </div>
             ))}
           </div>
