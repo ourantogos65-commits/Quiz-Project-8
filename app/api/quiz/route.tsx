@@ -1,30 +1,4 @@
-// import { Prisma } from "@/lib/generated/prisma/client";
-// import { NextResponse } from "next/server";
 
-// export async function GET(){
-//   try {
-//     const articles=await Prisma.article.findMany({
-//        orderBy:{
-//       createdAt:"desc"//shineer nemegdesnees haruulah
-//     }
-//     })
-//    return NextResponse.json(articles,{status:200})
-//   } catch (error) {
-//     return NextResponse.json({error:"failed to fetch"},{status:500})
-//   }
-// }
-// export async function POST (req:Request){
-// const {title,content}=await req.json()
-
-// try {
-//   const article = await prisma.article.create ({
-//     data:{title,content}
-//   })
-//   return NextResponse.json(article)
-// } catch (error) {
-//   return NextResponse.json( error)
-// }
-// }
 
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
@@ -57,9 +31,9 @@ export const POST = async (req: Request) => {
     });
 
     const quizText = result?.candidates?.[0]?.content?.parts?.[0]?.text || "";
-   const cleaned=(quizText?.slice(7,  quizText?.length-3));
-  
-    const quiz =JSON.parse(cleaned)
+    const cleaned = quizText?.slice(7, quizText?.length - 3);
+
+    const quiz = JSON.parse(cleaned);
     return NextResponse.json({ quiz });
   } catch (error) {
     console.error(error);
