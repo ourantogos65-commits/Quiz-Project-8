@@ -19,7 +19,7 @@ export const Dashboard = () => {
   const [summary, setSummary] = useState("");
   const [loading, setLoading] = useState<boolean>(false);
   const [quiz, setQuiz] = useState<QuizItem[]>([]);
-  const [selectedOption, setSelectedOption] = useState(null);
+  const [selectedOption, setSelectedOption] = useState(null)
 
   const postArticles = async () => {
     const res = await fetch("/api/articles", {

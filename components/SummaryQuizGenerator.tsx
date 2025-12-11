@@ -83,7 +83,13 @@ export const SummaryQuizGenerator = ({ quiz }: Props) => {
                   key={idx}
                   className={`mb-2 border flex items-center w-full justify-center  h-12 rounded-sm cursor-pointer duration-200 hover:bg-blue-200`}
                 >
-                  <p className="font-semibold ">{option}</p>
+                  <button
+                    key={idx}
+                    className={`  flex items-center w-100 justify-center  h-12 rounded-sm cursor-pointer duration-200 hover:bg-blue-200`}
+                  >
+                    <p className="font-semibold ">{option}</p>
+                  </button>
+                
                 </div>
               );
             })}
