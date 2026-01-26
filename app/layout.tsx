@@ -45,7 +45,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/AppSidebar";
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -78,11 +78,6 @@ export default function RootLayout({
           <Navbar />
 
           <SidebarProvider>
-            <div className="flex mt-22">
-              <AppSidebar />
-              <SidebarTrigger className=" items-center flex justify-center " />
-            </div>
-
             <main className="w-full  flex justify-center items-center ">
               {children}
             </main>

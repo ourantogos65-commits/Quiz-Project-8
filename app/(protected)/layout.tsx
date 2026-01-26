@@ -1,5 +1,7 @@
 "use client";
 
+import { AppSidebar } from "@/components/AppSidebar";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import { SignedIn, UserButton, useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 
@@ -16,7 +18,16 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   }, [user]);
   return (
     <>
-      <SignedIn>{user && <div>{children}</div>}</SignedIn>
+      <SignedIn>
+        {user && (
+          <div>
+            {" "}
+            <SidebarProvider>
+              <main className="">{children}</main>
+            </SidebarProvider>
+          </div>
+        )}
+      </SignedIn>
     </>
   );
 }

@@ -1,39 +1,50 @@
 import { prisma } from "@/lib/prisma";
-import { NextResponse } from "next/server";
 
+// GET request
 export async function GET() {
   try {
-    const articles = await prisma.articles.findMany({});
-    return Response.json(articles, { status: 200 });
+    const articles = await prisma.articles.findMany({
+      orderBy: { id: "desc" }, // latest articles first
+    });
+    return new Response(JSON.stringify(articles), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
   } catch (error) {
-    return Response.json({ error: "failed to fetch" }, { status: 500 });
+    console.error(error);
+    return new Response(JSON.stringify({ error: "Failed to fetch articles" }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 }
 
-// import { query } from "@/lib/connectDB";
-// import { NextResponse } from "next/server";
-
-// export const GET = async () => {
-//   try {
-//     const res = await query("SELECT * FROM articles");
-//     return NextResponse.json(res.rows);
-//   } catch (error) {
-//     console.log(error, "errror");
-//   }
-// };
-
+// POST request
 export const POST = async (req: Request) => {
-  const body = await req.json();
-  const { title } = body;
   try {
-    const res = await prisma.articles.create({
-     data:{
-      title:title
-     } 
+    const body = await req.json();
+    const { title, content } = body;
+
+    if (!title) {
+      return new Response(JSON.stringify({ error: "Title is required" }), {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
+    const article = await prisma.articles.create({
+      data: { title, content },
     });
 
-    return Response.json(res);
+    return new Response(JSON.stringify(article), {
+      status: 201,
+      headers: { "Content-Type": "application/json" },
+    });
   } catch (error) {
-    console.error(error, "error!!!");
+    console.error(error);
+    return new Response(JSON.stringify({ error: "Failed to create article" }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 };

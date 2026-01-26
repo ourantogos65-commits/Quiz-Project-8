@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
-
+import { useState, useEffect } from "react";
 import { SummarizeContent } from "./SummarizeContent";
-
 import { SummaryQuizGenerator } from "./SummaryQuizGenerator";
 import { SummaryForm } from "./SummaryForm";
+import { AppSidebar } from "./AppSidebar";
+import { ArticleType } from "@/lib/type";
 
 interface QuizItem {
   question: string;
@@ -19,18 +19,9 @@ export const Dashboard = () => {
   const [summary, setSummary] = useState("");
   const [loading, setLoading] = useState<boolean>(false);
   const [quiz, setQuiz] = useState<QuizItem[]>([]);
-  const [selectedOption, setSelectedOption] = useState(null)
-
-  const postArticles = async () => {
-    const res = await fetch("/api/articles", {
-      method: "POST",
-
-      body: JSON.stringify({ title }),
-    });
-
-    const data = await res.json();
-    console.log(data, "post article ");
-  };
+  const [selectedArticle, setSelectedArticle] = useState<ArticleType | null>(
+    null
+  );
 
   const SummaryGenerate = async () => {
     if (!title || !content) return alert("Please fill all fields");
@@ -47,6 +38,12 @@ export const Dashboard = () => {
 
       setSummary(data.summary);
       setQuiz([]);
+
+      await fetch("/api/articles", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title, content: data.summary }),
+      });
     } catch (error) {
       console.error(error);
       alert("Failed to generate summary");
@@ -67,7 +64,6 @@ export const Dashboard = () => {
       });
 
       const data = await res.json();
-      console.log(data, "quiz data");
       setQuiz(data.quiz);
     } catch (error) {
       console.error(error);
@@ -78,37 +74,48 @@ export const Dashboard = () => {
   };
 
   return (
-    <div className="flex justify-center py-10 w-[856px] bg-white p-5 border rounded-lg shadow-2xl">
-      <div className="w-[800px] flex flex-col gap-4">
-        <h1 className="text-2xl font-semibold">✨ Article Quiz Generator</h1>
+    <div className="flex mr-10 mt-30">
+      <AppSidebar onSelect={setSelectedArticle} />
 
-        {!summary && quiz.length === 0 && (
-          <SummaryForm
-            title={title}
-            setTitle={setTitle}
-            content={content}
-            setContent={setContent}
-            loading={loading}
-            SummaryGenerate={SummaryGenerate}
-          />
-        )}
+      <main className="flex-1 flex justify-center py-10">
+        <div className="w-[900px] flex flex-col gap-4 bg-white p-5 border rounded-lg shadow-2xl">
+          <h1 className="text-2xl font-semibold">✨ Article Quiz Generator</h1>
 
-        {summary && quiz.length === 0 && (
-          <SummarizeContent
-            summary={summary}
-            title={title}
-            setSummary={setSummary}
-            QuizGenerate={QuizGenerate}
-            loading={loading}
-          />
-        )}
-        {quiz.length > 0 && (
-          <SummaryQuizGenerator
-            quiz={quiz}
-           
-          />
-        )}
-      </div>
+          {selectedArticle ? (
+            <div className="mx-auto w-full ">
+              <h2 className="text-xl font-bold mb-2">
+                {selectedArticle.title}
+              </h2>
+              <p>{selectedArticle.content}</p>
+              <button
+                className="mt-4 px-4 py-2 bg-blue-600 text-white rounded"
+                onClick={() => setSelectedArticle(null)}
+              >
+                Back
+              </button>
+            </div>
+          ) : !summary && quiz.length === 0 ? (
+            <SummaryForm
+              title={title}
+              setTitle={setTitle}
+              content={content}
+              setContent={setContent}
+              loading={loading}
+              SummaryGenerate={SummaryGenerate}
+            />
+          ) : summary && quiz.length === 0 ? (
+            <SummarizeContent
+              title={title}
+              summary={summary}
+              setSummary={setSummary}
+              QuizGenerate={QuizGenerate}
+              loading={loading}
+            />
+          ) : (
+            <SummaryQuizGenerator quiz={quiz} />
+          )}
+        </div>
+      </main>
     </div>
   );
 };
